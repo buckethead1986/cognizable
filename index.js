@@ -19,13 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // logInUser();
   });
 
-  fetch("http://localhost:3000/users")
+  fetch("https://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => {
       populateLeaderboard(json);
     });
 
-  fetch("http://localhost:3000/cards")
+  fetch("https://cognizance.herokuapp.com/api/v1/cards")
     .then(res => res.json())
     .then(json => {
       initiateGameListener(json);
