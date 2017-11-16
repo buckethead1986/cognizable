@@ -3,7 +3,7 @@ const form = document.getElementById("form");
 const game = document.getElementById("game");
 const gameDeck = [];
 let currentUser = document.getElementById("current-user");
-let howManyRows = 1;
+let howManyRows = 3;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
@@ -149,7 +149,7 @@ function makeDecks(json) {
 }
 //randomizes images, adds an event listener to each card div, specific to an image
 function collectCards(json) {
-  const shuffledArray = gameDeck; //shuffleArray(gameDeck); //change shuffleArray(gameDeck) to gameDeck to troubleshoot (wont shuffle)
+  const shuffledArray = shuffleArray(gameDeck); //change shuffleArray(gameDeck) to gameDeck to troubleshoot (wont shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
     addCardListener(cards[i], shuffledArray[i]);
