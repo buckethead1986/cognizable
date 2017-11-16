@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Memory</title>
+    <title>Cognizance</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css">
     <link rel="stylesheet" type="text/css" href="index.css">
@@ -24,14 +24,23 @@
       <div id="navbarExampleTransparentExample" class="navbar-menu">
         <div class="navbar-start">
           <a class="navbar-item" id="start-button">
-            Start Game
+            Cognizance
           </a>
           </div>
         </div>
 
+
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="field is-grouped">
+              <p class="control">
+                <a class="button is-white" id="start-button">
+                  <span class="icon">
+                    <i class="fa fa-play"></i>
+                  </span>
+                  <span class="start-button">Start Game</span>
+                </a>
+              </p>
               <p class="control">
                 <a class="button is-white" id="timer">
                   <span class="icon">
@@ -54,7 +63,7 @@
       </div>
     </nav>
     <!-- end of navigation bar -->
-    <form class="field" id="form">
+    <!-- <form class="field" id="form">
       <label class="label">Current User</label>
       <p id="current-user">None</p></br>
       <label class="label">Login Different User</label>
@@ -63,7 +72,7 @@
         <input type="submit" name="" value="Submit">
       </div>
       <p class="help">Enter your name, beat your high score!</p>
-    </form>
+    </form> -->
 
     <!-- beginning of card canvas -->
     <div id="game" class="">
@@ -75,50 +84,72 @@
 
     <!-- leaderboard -->
     <div class="tile is-ancestor">
+      <!-- padding for left of leaderboard -->
       <div class="tile is-2">
-        <!-- padding for left of leaderboard -->
       </div>
+      <!-- center tile ** contains user login and leaderboard ** -->
       <div class="tile is-8 is-parent">
-        <!-- center tile ** contains leaderboard ** -->
-        <div class="tile is-child">
-          <nav class="panel" id="leaderboard">
-            <p class="panel-heading has-text-centered">
-              Leaderboard
-            </p>
-            <a class="panel-block" id="leaderboard-first-place">
-              <span class="panel-icon">
-                <i class="fa fa-star-o"></i>
-              </span>
-            </a>
-            <a class="panel-block" id="leaderboard-second-place">
-              <span class="panel-icon">
-                <i class="fa fa-star-o"></i>
-              </span>
-            </a>
-            <a class="panel-block" id="leaderboard-third-place">
-              <span class="panel-icon">
-                <i class="fa fa-star-o"></i>
-              </span>
-            </a>
-            <a class="panel-block" id="leaderboard-fourth-place">
-              <span class="panel-icon">
-                <i class="fa fa-star-o"></i>
-              </span>
-            </a>
-            <a class="panel-block" id="leaderboard-fifth-place">
-              <span class="panel-icon">
-                <i class="fa fa-star-o"></i>
-              </span>
-            </a>
-          </nav>
+        <div class="tile">
+          <!-- left tile with user login -->
+          <div class="tile is-child" id="form">
+              <!-- Current User Info -->
+              <h2 class="subtitle is-3">Current User</h2>
+              <h5 class="subtitle is-5 margins" id="current-user">No one is logged in at the moment!</p>
+              <!-- Login Info -->
+              <h2 class="subtitle is-3">Log In</h2>
+              <input class="input" id="nameInput" type="text" placeholder="Your Name">
+              <!-- Submit Info -->
+              <div class="label"></div>
+              <button class="button is-info">Submit</button>
+
+              <!-- <div class="field">
+                <input id="nameInput" class="input" type="text" placeholder="Your Name">
+                <input type="submit" name="" value="Submit">
+              </div> -->
+            </div>
+            <!-- end of left tile with user login -->
+          </div>
+          <!-- right tile with leaderboard -->
+          <div class="tile is-child">
+            <nav class="panel" id="leaderboard">
+              <p class="panel-heading has-text-centered">
+                Leaderboard
+              </p>
+              <a class="panel-block" id="leaderboard-first-place">
+                <span class="panel-icon">
+                  <i class="fa fa-star-o"></i>
+                </span>
+              </a>
+              <a class="panel-block" id="leaderboard-second-place">
+                <span class="panel-icon">
+                  <i class="fa fa-star-o"></i>
+                </span>
+              </a>
+              <a class="panel-block" id="leaderboard-third-place">
+                <span class="panel-icon">
+                  <i class="fa fa-star-o"></i>
+                </span>
+              </a>
+              <a class="panel-block" id="leaderboard-fourth-place">
+                <span class="panel-icon">
+                  <i class="fa fa-star-o"></i>
+                </span>
+              </a>
+              <a class="panel-block" id="leaderboard-fifth-place">
+                <span class="panel-icon">
+                  <i class="fa fa-star-o"></i>
+                </span>
+              </a>
+            </nav>
+            <!-- end of right tile with leaderboard -->
+          </div>
+          <!-- end of center tile containing login and leaderboard -->
         </div>
-      </div>
-      <!-- end of center tile containing leaderboard -->
-      <div class="tile is-2">
         <!-- padding for right of leaderboard -->
+        <div class="tile is-2">
+        </div>
+        <!-- end of bottom tiles containing padding and login and leaderboard -->
       </div>
-    </div>
-    <!-- end of leaderboard -->
     <script type="text/javascript" src="index.js"></script>
   </body>
 </html>

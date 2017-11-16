@@ -53,7 +53,7 @@ function createUserNameTag(user) {
 // create tags for ranked user's score
 function createUserScoreTag(user) {
   let scoreTag = document.createElement("p");
-  scoreTag.setAttribute("class", "subtitle-3 margins");
+  scoreTag.setAttribute("class", "subtitle-3 margins has-text-centered");
   scoreTag.innerText = user.highscore;
   return scoreTag;
 }
@@ -303,8 +303,7 @@ function checkGameStatus() {
 // 'Log in' a user. Just checks input name against json data, makes a new user in api if the name doesnt match any records
 function logInUser() {
   const username = document.getElementById("nameInput").value;
-  // WE NEED TO MAKE THIS THE HEROKU URL
-  fetch("http://cognizance.herokuapp.com/api/v1/users")
+  fetch("https://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => checkCurrentUser(json.data, username));
   document.getElementById("nameInput").value = "";
@@ -342,7 +341,7 @@ function makeUser(username) {
 }
 
 function setUser(username) {
-  currentUser.innerText = username;
+  currentUser.innerText = `${username} is playing`;
 }
 
 //-------------------
