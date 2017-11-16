@@ -10,6 +10,7 @@ let matchId = [];
 let timer;
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("inside dom");
   makeBoardOfXRows(howManyRows);
   form.addEventListener("submit", function(e) {
     e.preventDefault();
@@ -30,13 +31,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // sort through array of users in descending order based on score
-function sortUserScoreDescending(data) {
-  let users = data.slice(0);
-  users.sort((a, b) => {
-    return b.highscore - a.highscore
-  })
-  return users;
-}
+// causing issues due to asynchronous fetch -- will fix momentarily
+// function sortUserScoreDescending(data) {
+//   let users = data.slice(0);
+//   users.sort((a, b) => {
+//     return b.highscore - a.highscore
+//   })
+//   return users;
+// }
 
 // create tags for ranked user's name
 function createUserNameTag(user) {
@@ -56,7 +58,11 @@ function createUserScoreTag(user) {
 
 // iterate through scoreboard places and populate each rank with tags from cbs
 function populateLeaderboard(data) {
-  let sortedUsers = sortUserScoreDescending(data);
+  // let sortedUsers = sortUserScoreDescending(data);
+  let sortedUsers = data.slice(0);
+  sortedUsers.sort((a, b) => {
+    return b.highscore - a.highscore
+  })
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
     let rank = scoreboardPlace[i];
