@@ -273,8 +273,8 @@ function makeClone(e) {
 //on wrong guesses, changes card image back
 // to the 'back' of the card. resets matchId and currentFlipped
 function changeBack() {
-  document.getElementById(matchId[1]).style.background = "blue";
-  document.getElementById(matchId[3]).style.background = "blue";
+  document.getElementById(matchId[1]).style.background = "#209CEE";
+  document.getElementById(matchId[3]).style.background = "#209CEE";
   matchId = [];
   currentFlipped = 0;
 }

@@ -29,7 +29,7 @@
 .card {
   width: 100px;
   height: 150px;
-  background-color: blue;
+  background-color: #209CEE;
   margin: 10px;
   float: left;
 }
@@ -37,7 +37,7 @@
 .matched {
     width: 100px;
     height: 150px;
-    background-color: blue;
+    background-color: #209CEE;
     margin: 10px;
     float: left;
     opacity: 0.4;
