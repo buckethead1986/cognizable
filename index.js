@@ -7,11 +7,10 @@ let howManyRows = 3;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
+let timer;
 
 document.addEventListener("DOMContentLoaded", () => {
-  //set on click event when they say how many rows they want/reset game?
   makeBoardOfXRows(howManyRows);
-  // debugger; //move outside, give option to set how many rows? (how difficult)
   form.addEventListener("submit", function(e) {
     e.preventDefault();
     // logInUser();
@@ -19,56 +18,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fetch("https://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
-    .then(json => json);
+    .then(json => {
+      populateLeaderboard(json.data);
+    });
 
   fetch("https://cognizance.herokuapp.com/api/v1/cards")
     .then(res => res.json())
     .then(json => {
-      initiateGameListener(json);
+      initiateGameListener(json.data);
     });
 });
+
+// sort through array of users in descending order based on score
+function sortUserScoreDescending(data) {
+  let users = data.slice(0);
+  users.sort((a, b) => {
+    return b.highscore - a.highscore
+  })
+  return users;
+}
+
+// create tags for ranked user's name
+function createUserNameTag(user) {
+  let nameTag = document.createElement('p');
+  nameTag.setAttribute("class", "title-3 has-text-info has-text-weight-bold");
+  nameTag.innerText = `${user.name}: `;
+  return nameTag;
+}
+
+// create tags for ranked user's score
+function createUserScoreTag(user) {
+  let scoreTag = document.createElement('p');
+  scoreTag.setAttribute("class", "subtitle-3");
+  scoreTag.innerText = user.highscore;
+  return scoreTag;
+}
+
+// iterate through scoreboard places and populate each rank with tags from cbs
+function populateLeaderboard(data) {
+  let sortedUsers = sortUserScoreDescending(data);
+  let scoreboardPlace = document.querySelectorAll(".panel-block");
+  for (let i = 0; i < scoreboardPlace.length; i++) {
+    let rank = scoreboardPlace[i];
+    let user = sortedUsers[i];
+    let nameTag = createUserNameTag(user);
+    let scoreTag = createUserScoreTag(user);
+    rank.appendChild(nameTag);
+    rank.appendChild(scoreTag)
+  }
+}
 
 // starts timer and allows user to play when start button is clicked
 function initiateGameListener(json) {
   const startButton = document.getElementById("start-button");
   startButton.addEventListener("click", () => {
-    console.log("you've clicked start");
     generateCards(json);
     startTimer();
   });
 }
 
-// function timer() {
-//   let timeDiv = document.getElementsByClassName("timer-count");
-//   let time = timeDiv[0].innerText;
-//   time = "00:59";
-//   timeDiv[0].innerText = time;
-//   let seconds = parseInt(time.split(":")[1]);
-//   let timer = setInterval(function() {
-//     checkGameStatus();
-//     let timeDiv = document.getElementsByClassName("timer-count");
-//     if (seconds === 0) {
-//       console.log("timer is over");
-//       clearInterval(timer);
-//     } else if (seconds > 10) {
-//       console.log("timer is not zero");
-//       --seconds;
-//       timeDiv[0].innerText = `00:${seconds}`;
-//     } else {
-//       console.log("timer is less than 10");
-//       --seconds;
-//       timeDiv[0].innerText = `00:0${seconds}`;
-//     }
-//   }, 1000);
-// }
-let timer;
 function startTimer() {
   let timeDiv = document.getElementsByClassName("timer-count");
   let time = timeDiv[0].innerText;
   time = 0;
-  // console.log(time[0].innerText);
   timer = setInterval(function() {
-    // console.log(time);
     checkGameStatus();
     if (!document.getElementsByClassName("win")[0]) {
       ++time;
@@ -77,56 +90,23 @@ function startTimer() {
   }, 1000);
 }
 
-// function logInUser() {
-//   const username = document.getElementById("nameInput").value;
-//   fetch("http://localhost:3000/users")
-//     .then(res => res.json())
-//     .then(json => checkCurrentUser(json, username));
-//   document.getElementById("nameInput").value = "";
-// }
-//
-// function checkCurrentUser(json, username) {
-//   let userHere = false;
-//   json.forEach(function(json) {
-//     if (json.name === username) {
-//       userHere = true;
-//       fetchUser(json, username);
-//     }
-//   });
-//   if (!userHere) {
-//     makeUser(username);
-//   }
-// }
-//
-// function fetchUser(json, username) {
-//   currentUser.innerText = username;
-// }
-//
-// function makeUser(username) {
-//   fetch("http://localhost:3000/users", {
-//     method: "post",
-//     mode: "no-cors",
-//     body: JSON.stringify({ user: { name: username, highscore: 25 } }),
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json"
-//     }
-//   })
-//     .then(res => res.json())
-//     .then(res => console.log(res));
-// }
-
+// reloads webpage when eventlistener on reset button is triggered
 function resetGame() {
   const resetButton = document.getElementsByClassName("game-reset");
   resetButton.addEventListener("click", () => {
     let timeDiv = document.getElementsByClassName("timer-count");
     timeDiv[0].innerText = "Timer";
-
-    fetch("http://localhost:3000/cards")
+    fetch("https://cognizance.herokuapp.com/api/v1/users")
       .then(res => res.json())
       .then(json => {
-        initiateGameListener(json);
+        populateLeaderboard(json.data);
       });
+
+    fetch("https://cognizance.herokuapp.com/api/v1/cards")
+      .then(res => res.json())
+      .then(json => {
+        initiateGameListener(json.data);
+    });
   });
 }
 
@@ -135,10 +115,11 @@ function generateCards(json) {
   collectCards(json);
 }
 
-//gets random card from all json, addCardToDe adds to gameDeck, then removes from json array for next iteration
+//gets random card from all json, addCardToDe adds to gameDeck,
+// then removes from json array for next iteration
 function makeDecks(json) {
   for (let i = 0; i < howManyRows * 4; i++) {
-    var rand = json[Math.floor(Math.random() * json.length)];
+    let rand = json[Math.floor(Math.random() * json.length)];
     let index = json.indexOf(rand);
     addCardToDeck(rand);
     if (index > -1) {
@@ -147,9 +128,12 @@ function makeDecks(json) {
     }
   }
 }
-//randomizes images, adds an event listener to each card div, specific to an image
+
+//randomizes images, adds an event listener to each card div,
+// specific to an image
 function collectCards(json) {
-  const shuffledArray = shuffleArray(gameDeck); //change shuffleArray(gameDeck) to gameDeck to troubleshoot (wont shuffle)
+  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
+  //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
     addCardListener(cards[i], shuffledArray[i]);
@@ -186,17 +170,24 @@ function addCardToDeck(json) {
 //adds a 'flipping' listener to each card on click
 function addCardListener(card, shuffledArray) {
   card.addEventListener("click", function() {
-    //fixes bug where you could click the same card twice and get a match
+    //fixes bug where you could click the
+    // same card twice and get a match
     if (this.id != matchId[1]) {
-      //currentFlipped resets every 2nd click, and triggers a match check (doTheyMatch)
+      //currentFlipped resets every 2nd click,
+      // and triggers a match check (doTheyMatch)
       if (currentFlipped != 2) {
         currentFlipped += 1;
         if (currentFlipped % 2 === 0) {
-          totalFlips += 1; //increments score, by pair of clicks.
+          totalFlips += 1;
+          //increments score, by pair of clicks.
         }
-        card.style.backgroundImage = `url('${shuffledArray.image}')`; //changes div image
+        card.style.backgroundImage = `
+          url('${shuffledArray.image}')
+        `; //changes div image
         card.style.id = shuffledArray.id;
-        matchId.push(card.style.id, card.id); //card.style.id is the id of the json image, card.id is the id of the div, used for determining matches
+        matchId.push(card.style.id, card.id);
+        //card.style.id is the id of the json image,
+        // card.id is the id of the div, used for determining matches
         if (currentFlipped === 2) {
           doTheyMatch();
         }
@@ -239,10 +230,14 @@ function doTheyMatch() {
     matchId[0].toString() === "a" + matchId[2] ||
     "a" + matchId[0] === matchId[2].toString()
   ) {
-    // if (matchId[0] === matchId[2] && matchId[1] != matchId[3]) { //also works, remove the "a" assignment from addCardToDeck. Less good, as id's should be unique
+    // if (matchId[0] === matchId[2] && matchId[1] != matchId[3])
+    // { //also works, remove the "a" assignment from addCardToDeck. Less good, as id's should be unique
     theyMatch();
   } else {
-    setTimeout(changeBack, 1500); //Want to make this a click event, not a timeout, but cant get the click working over the entire page.  Currently, it only works 'not on a card div'
+    setTimeout(changeBack, 1500);
+    //Want to make this a click event, not a timeout,
+    // but cant get the click working over the entire page.
+    // Currently, it only works 'not on a card div'
   }
 }
 
@@ -250,7 +245,9 @@ function theyMatch() {
   window.setTimeout(changeMatching, 500);
 }
 
-//makes a clone of the divs, removes the original (and their associated event listeners), sets the new clone opacity, resets the matchId array, resets the currently flipped cards counter
+//makes a clone of the divs, removes the original
+// (and their associated event listeners), sets the new clone opacity,
+// resets the matchId array, resets the currently flipped cards counter
 function changeMatching() {
   document.getElementById(matchId[1]).className = "matched";
   document.getElementById(matchId[3]).className = "matched";
@@ -270,7 +267,8 @@ function makeClone(e) {
   element.parentNode.replaceChild(clone, element);
 }
 
-//on wrong guesses, changes card image back to the 'back' of the card. resets matchId and currentFlipped
+//on wrong guesses, changes card image back
+// to the 'back' of the card. resets matchId and currentFlipped
 function changeBack() {
   document.getElementById(matchId[1]).style.background = "blue";
   document.getElementById(matchId[3]).style.background = "blue";
@@ -291,6 +289,53 @@ function checkGameStatus() {
     // postGameData();
   }
 }
+
+
+
+// FUNCTIONS THAT NEED TO BE WORKED ON
+
+// function logInUser() {
+//   const username = document.getElementById("nameInput").value;
+//   WE NEED TO MAKE THIS THE HEROKU URL
+//   fetch("http://localhost:3000/users")
+//     .then(res => res.json())
+//     .then(json => checkCurrentUser(json, username));
+//   document.getElementById("nameInput").value = "";
+// }
+
+// function checkCurrentUser(json, username) {
+//   let userHere = false;
+//   json.forEach(function(json) {
+//     if (json.name === username) {
+//       userHere = true;
+//       fetchUser(json, username);
+//     }
+//   });
+//   if (!userHere) {
+//     // debugger;
+//     makeUser(username);
+//   }
+// }
+
+// function fetchUser(json, username) {
+//   // debugger;
+//   currentUser.innerText = username;
+// }
+
+// function makeUser(username) {
+//   debugger;
+//   fetch("http://localhost:3000/users", {
+//     method: "post",
+//     mode: "no-cors",
+//     body: JSON.stringify({ user: { name: username, highscore: 25 } }),
+//     headers: {
+//       Accept: "application/json",
+//       "Content-Type": "application/json"
+//     }
+//   })
+//     // .then(res => res.json())
+//     .then(res => console.log(res));
+// }
 
 // function postGameData() {
 //   fetch("http://localhost:3000/users", {
