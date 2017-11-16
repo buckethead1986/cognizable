@@ -10,7 +10,6 @@ let matchId = [];
 let timer;
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("inside dom");
   makeBoardOfXRows(howManyRows);
   form.addEventListener("submit", function(e) {
     e.preventDefault();
@@ -31,14 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // sort through array of users in descending order based on score
-// causing issues due to asynchronous fetch -- will fix momentarily
-// function sortUserScoreDescending(data) {
-//   let users = data.slice(0);
-//   users.sort((a, b) => {
-//     return b.highscore - a.highscore
-//   })
-//   return users;
-// }
+function sortUserScoreDescending(data) {
+  let users = data.slice(0);
+  users.sort((a, b) => {
+    return b.attributes.highscore - a.attributes.highscore
+  })
+  return users;
+}
 
 // create tags for ranked user's name
 function createUserNameTag(user) {
@@ -51,22 +49,21 @@ function createUserNameTag(user) {
 // create tags for ranked user's score
 function createUserScoreTag(user) {
   let scoreTag = document.createElement('p');
-  scoreTag.setAttribute("class", "subtitle-3");
+  scoreTag.setAttribute("class", "subtitle-3 margins");
   scoreTag.innerText = user.highscore;
   return scoreTag;
 }
 
 // iterate through scoreboard places and populate each rank with tags from cbs
 function populateLeaderboard(data) {
-  // let sortedUsers = sortUserScoreDescending(data);
-  let sortedUsers = data.slice(0);
+  let sortedUsers = sortUserScoreDescending(data);
   sortedUsers.sort((a, b) => {
-    return b.highscore - a.highscore
+    return b.attributes.highscore - a.attributes.highscore
   })
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
     let rank = scoreboardPlace[i];
-    let user = sortedUsers[i];
+    let user = sortedUsers[i].attributes;
     let nameTag = createUserNameTag(user);
     let scoreTag = createUserScoreTag(user);
     rank.appendChild(nameTag);
@@ -124,13 +121,16 @@ function generateCards(json) {
 //gets random card from all json, addCardToDe adds to gameDeck,
 // then removes from json array for next iteration
 function makeDecks(json) {
+  let newJSON = json.map((obj) => {
+    return obj.attributes });
+
   for (let i = 0; i < howManyRows * 4; i++) {
-    let rand = json[Math.floor(Math.random() * json.length)];
-    let index = json.indexOf(rand);
+    let rand = newJSON[Math.floor(Math.random() * newJSON.length)];
+    let index = newJSON.indexOf(rand);
     addCardToDeck(rand);
     if (index > -1) {
-      //removes from json array
-      json.splice(index, 1);
+      //removes from newJSON array
+      newJSON.splice(index, 1);
     }
   }
 }
