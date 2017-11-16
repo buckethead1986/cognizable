@@ -3,11 +3,13 @@ const form = document.getElementById("form");
 const game = document.getElementById("game");
 const gameDeck = [];
 let currentUser = document.getElementById("current-user");
-let howManyRows = 2;
+let howManyRows = 1;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
 let timer;
+let data;
+let gameOver = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
@@ -16,11 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
     logInUser();
   });
 
-  fetch("https://cognizance.herokuapp.com/api/v1/users")
+  fetch("http://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => {
       populateLeaderboard(json.data);
-    });
+      return json;
+    })
+    .then(json => (data = json));
 
   fetch("https://cognizance.herokuapp.com/api/v1/cards")
     .then(res => res.json())
@@ -85,10 +89,11 @@ function startTimer() {
   let time = timeDiv[0].innerText;
   time = 0;
   timer = setInterval(function() {
-    checkGameStatus();
-    if (!document.getElementsByClassName("win")[0]) {
+    if (!gameOver) {
       ++time;
       timeDiv[0].innerText = time;
+    } else {
+      clearInterval(timer);
     }
   }, 1000);
 }
@@ -135,7 +140,7 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
-  const shuffledArray = shuffleArray(gameDeck);
+  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
@@ -258,6 +263,7 @@ function changeMatching() {
   // document.getElementById(matchId[3]).style.opacity = 0.4;
   matchId = [];
   currentFlipped = 0;
+  checkGameStatus();
 }
 
 //removes all event listeners, clones and appends div (so no more clicks can occur)
@@ -289,7 +295,8 @@ function checkGameStatus() {
     win.className = "win";
     game.appendChild(win);
     document.getElementsByClassName("timer-count")[0].innerText = currentTime;
-    // postGameData();
+    postGameData();
+    gameOver = true;
   }
 }
 
@@ -297,7 +304,7 @@ function checkGameStatus() {
 function logInUser() {
   const username = document.getElementById("nameInput").value;
   // WE NEED TO MAKE THIS THE HEROKU URL
-  fetch("https://cognizance.herokuapp.com/api/v1/users")
+  fetch("http://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => checkCurrentUser(json.data, username));
   document.getElementById("nameInput").value = "";
@@ -306,7 +313,6 @@ function logInUser() {
 function checkCurrentUser(json, username) {
   let userHere = false;
   json.forEach(function(json) {
-    // debugger;
     if (json.attributes.name === username) {
       userHere = true;
       fetchUser(json, username);
@@ -318,21 +324,20 @@ function checkCurrentUser(json, username) {
 }
 
 function fetchUser(json, username) {
-  // debugger;
   currentUser.innerText = username;
 }
 
 function makeUser(username) {
-  // debugger;
-  fetch("https://cognizance.herokuapp.com/api/v1/users", {
+  fetch("http://cognizance.herokuapp.com/api/v1/users", {
     method: "post",
 
-    body: JSON.stringify({ user: { name: username, highscore: 0 } }),
+    body: JSON.stringify({ user: { name: username, highscore: 500 } }),
     headers: {
-      Accept: "application/json",
       "Content-Type": "application/json"
     }
-  });
+  })
+    .then(res => res.json())
+    .then(json => (data = json));
   setUser(username);
 }
 
@@ -341,24 +346,37 @@ function setUser(username) {
 }
 
 //-------------------
+//with difficulty options, add in another parameter to check against (at current difficulty)
+// update highscores table after game finishes
+function postGameData() {
+  let id = 0;
+  //returns wanted data for all users. id, name, highscore currently in database
+  const users = data.data.map(function(user) {
+    return [user.id, user.attributes.name, user.attributes.highscore];
+  });
+  //checks name against database name, sets id if they match
+  const user = users.forEach(function(user) {
+    if (user[1] === currentUser.innerText) {
+      id = user[0];
+      //if this games highscore is better (lower) than databse, updates
+      if (user[2] > totalFlips) {
+        updateHighScore(id);
+      }
+    }
+  });
+}
 
-// FUNCTIONS THAT NEED TO BE WORKED ON
-
-// function postGameData() {
-//   fetch("http://localhost:3000/users", {
-//     method: "post",
-//     headers: {
-//       "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify({ highscore: `${totalFlips}` })
-//   });
-// }
-
-// function updateGame() {
-//   const body = { gameArray: shuffledArray };
-//   fetch("http://localhost:3000/cards", {
-//     method: "patch",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(body)
-//   });
-// }
+function updateHighScore(id) {
+  fetch(`http://cognizance.herokuapp.com/api/v1/users/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      user: {
+        name: `${currentUser.innerText}`,
+        highscore: `${totalFlips}`
+      }
+    })
+  });
+}
