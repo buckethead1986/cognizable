@@ -1,4 +1,4 @@
-//global variables
+// const form = document.getElementById("form");
 const form = document.getElementById("form");
 const game = document.getElementById("game");
 const gameDeck = [];
@@ -7,9 +7,7 @@ let howManyRows = 1;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
-let timer;
 
-// fetch data from Rails API when webpage loads
 document.addEventListener("DOMContentLoaded", () => {
   //set on click event when they say how many rows they want/reset game?
   makeBoardOfXRows(howManyRows);
@@ -21,9 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fetch("http://localhost:3000/users")
     .then(res => res.json())
-    .then(json => {
-      populateLeaderboard(json);
-    });
+    .then(json => json);
 
   fetch("http://localhost:3000/cards")
     .then(res => res.json())
@@ -32,54 +28,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// sort JSON data in descending order based off User score
-function sortUserScoreDescending(data) {
-  let users = data.slice(0);
-  users.sort((a, b) => {
-    return b.highscore - a.highscore
-  })
-  return users;
-}
-
-// create tags for ranked user's name
-function createUserNameTag(user) {
-  let nameTag = document.createElement('p');
-  nameTag.setAttribute("class", "title-3 has-text-info has-text-weight-bold");
-  nameTag.innerText = `${user.name}: `;
-  return nameTag;
-}
-
-// create tags for ranked user's score
-function createUserScoreTag(user) {
-  let scoreTag = document.createElement('p');
-  scoreTag.setAttribute("class", "subtitle-3");
-  scoreTag.innerText = user.highscore;
-  return scoreTag;
-}
-
-// iterate through scoreboard places and populate each rank with tags from cbs
-function populateLeaderboard(data) {
-  let sortedUsers = sortUserScoreDescending(data);
-  let scoreboardPlace = document.querySelectorAll(".panel-block");
-  for (let i = 0; i < scoreboardPlace.length; i++) {
-    let rank = scoreboardPlace[i];
-    let user = sortedUsers[i];
-    let nameTag = createUserNameTag(user);
-    let scoreTag = createUserScoreTag(user);
-    rank.appendChild(nameTag);
-    rank.appendChild(scoreTag)
-  }
-}
-
-// listens for click of start button to initiate game
+// starts timer and allows user to play when start button is clicked
 function initiateGameListener(json) {
   const startButton = document.getElementById("start-button");
   startButton.addEventListener("click", () => {
+    console.log("you've clicked start");
     generateCards(json);
     startTimer();
   });
 }
 
+// function timer() {
+//   let timeDiv = document.getElementsByClassName("timer-count");
+//   let time = timeDiv[0].innerText;
+//   time = "00:59";
+//   timeDiv[0].innerText = time;
+//   let seconds = parseInt(time.split(":")[1]);
+//   let timer = setInterval(function() {
+//     checkGameStatus();
+//     let timeDiv = document.getElementsByClassName("timer-count");
+//     if (seconds === 0) {
+//       console.log("timer is over");
+//       clearInterval(timer);
+//     } else if (seconds > 10) {
+//       console.log("timer is not zero");
+//       --seconds;
+//       timeDiv[0].innerText = `00:${seconds}`;
+//     } else {
+//       console.log("timer is less than 10");
+//       --seconds;
+//       timeDiv[0].innerText = `00:0${seconds}`;
+//     }
+//   }, 1000);
+// }
+let timer;
 function startTimer() {
   let timeDiv = document.getElementsByClassName("timer-count");
   let time = timeDiv[0].innerText;
@@ -102,7 +84,7 @@ function startTimer() {
 //     .then(json => checkCurrentUser(json, username));
 //   document.getElementById("nameInput").value = "";
 // }
-
+//
 // function checkCurrentUser(json, username) {
 //   let userHere = false;
 //   json.forEach(function(json) {
@@ -112,18 +94,15 @@ function startTimer() {
 //     }
 //   });
 //   if (!userHere) {
-//     // debugger;
 //     makeUser(username);
 //   }
 // }
-
+//
 // function fetchUser(json, username) {
-//   // debugger;
 //   currentUser.innerText = username;
 // }
-
+//
 // function makeUser(username) {
-//   debugger;
 //   fetch("http://localhost:3000/users", {
 //     method: "post",
 //     mode: "no-cors",
@@ -133,27 +112,24 @@ function startTimer() {
 //       "Content-Type": "application/json"
 //     }
 //   })
-//     // .then(res => res.json())
+//     .then(res => res.json())
 //     .then(res => console.log(res));
 // }
 
-// reloads webpage when eventlistener on reset button is triggered
 function resetGame() {
-  const resetButton = document.getElementbyId("reset-game");
+  const resetButton = document.getElementsByClassName("game-reset");
   resetButton.addEventListener("click", () => {
-    fetch("http://localhost:3000/users")
-      .then(res => res.json())
-      .then(json => json);
+    let timeDiv = document.getElementsByClassName("timer-count");
+    timeDiv[0].innerText = "Timer";
 
     fetch("http://localhost:3000/cards")
       .then(res => res.json())
       .then(json => {
         initiateGameListener(json);
-    });
+      });
   });
 }
 
-// creates cards from JSON and appends to card canvas
 function generateCards(json) {
   makeDecks(json);
   collectCards(json);
@@ -171,7 +147,6 @@ function makeDecks(json) {
     }
   }
 }
-
 //randomizes images, adds an event listener to each card div, specific to an image
 function collectCards(json) {
   const shuffledArray = gameDeck; //shuffleArray(gameDeck); //change shuffleArray(gameDeck) to gameDeck to troubleshoot (wont shuffle)
@@ -183,7 +158,7 @@ function collectCards(json) {
 
 //modern version of fischer-yates shuffle algorithm, shuffles array.
 function shuffleArray(array) {
-  let j, x, i;
+  var j, x, i;
   for (i = array.length - 1; i > 0; i--) {
     j = Math.floor(Math.random() * (i + 1));
     x = array[i];
@@ -192,7 +167,6 @@ function shuffleArray(array) {
   }
   return array;
 }
-
 //push 2 of the same card to gameDeck (for matching)
 function addCardToDeck(json) {
   gameDeck.push({
@@ -234,8 +208,8 @@ function addCardListener(card, shuffledArray) {
 //makes a game board of a certain number of rows of 8 cards.
 function makeBoardOfXRows(rows) {
   gameBoardDimensions(rows);
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < 8; j++) {
+  for (var i = 0; i < rows; i++) {
+    for (var j = 0; j < 8; j++) {
       const card = document.createElement("div");
       card.className = "card";
       card.id = `id-${i}${j}`;
