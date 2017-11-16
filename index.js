@@ -61,6 +61,7 @@ function createUserScoreTag(user) {
 
 // iterate through scoreboard places and populate each rank with tags from cbs
 function populateLeaderboard(data) {
+  // console.log("inside leaderboard pop second time");
   let sortedUsers = sortUserScoreDescending(data);
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
@@ -137,7 +138,7 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
-  const shuffledArray = shuffleArray(gameDeck);
+  const shuffledArray = gameDeck //shuffleArray(gameDeck);
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
@@ -311,7 +312,6 @@ function checkCurrentUser(json, username) {
   let userHere = false;
   json.forEach(function(json) {
     if (json.attributes.name === username) {
-      console.log("inside");
       userHere = true;
       fetchUser(json, username);
     }
@@ -334,8 +334,7 @@ function makeUser(username) {
       "Content-Type": "application/json"
     }
   })
-    .then(res => res.json())
-    .then(json => (data = json));
+
   setUser(username);
 }
 
@@ -377,13 +376,14 @@ function updateHighScore(id) {
       }
     })
   });
-  updateLeaderboard();
 }
 
 function updateLeaderboard() {
   fetch("http://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => {
+      // console.log("inside new fetch");
+      // console.log(json.data);
       populateLeaderboard(json.data);
     })
 }
