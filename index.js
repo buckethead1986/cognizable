@@ -3,7 +3,7 @@ const form = document.getElementById("form");
 const game = document.getElementById("game");
 const gameDeck = [];
 let currentUser = document.getElementById("current-user");
-let howManyRows = 3;
+let howManyRows = 2;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
@@ -33,14 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
 function sortUserScoreDescending(data) {
   let users = data.slice(0);
   users.sort((a, b) => {
-    return b.attributes.highscore - a.attributes.highscore
-  })
+    return b.attributes.highscore - a.attributes.highscore;
+  });
   return users;
 }
 
 // create tags for ranked user's name
 function createUserNameTag(user) {
-  let nameTag = document.createElement('p');
+  let nameTag = document.createElement("p");
   nameTag.setAttribute("class", "title-3 has-text-info has-text-weight-bold");
   nameTag.innerText = `${user.name}: `;
   return nameTag;
@@ -48,7 +48,7 @@ function createUserNameTag(user) {
 
 // create tags for ranked user's score
 function createUserScoreTag(user) {
-  let scoreTag = document.createElement('p');
+  let scoreTag = document.createElement("p");
   scoreTag.setAttribute("class", "subtitle-3 margins");
   scoreTag.innerText = user.highscore;
   return scoreTag;
@@ -58,8 +58,8 @@ function createUserScoreTag(user) {
 function populateLeaderboard(data) {
   let sortedUsers = sortUserScoreDescending(data);
   sortedUsers.sort((a, b) => {
-    return b.attributes.highscore - a.attributes.highscore
-  })
+    return b.attributes.highscore - a.attributes.highscore;
+  });
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
     let rank = scoreboardPlace[i];
@@ -67,7 +67,7 @@ function populateLeaderboard(data) {
     let nameTag = createUserNameTag(user);
     let scoreTag = createUserScoreTag(user);
     rank.appendChild(nameTag);
-    rank.appendChild(scoreTag)
+    rank.appendChild(scoreTag);
   }
 }
 
@@ -109,7 +109,7 @@ function resetGame() {
       .then(res => res.json())
       .then(json => {
         initiateGameListener(json.data);
-    });
+      });
   });
 }
 
@@ -121,16 +121,17 @@ function generateCards(json) {
 //gets random card from all json, addCardToDe adds to gameDeck,
 // then removes from json array for next iteration
 function makeDecks(json) {
-  let newJSON = json.map((obj) => {
-    return obj.attributes });
+  let newJSON = json.map(obj => {
+    return obj.attributes;
+  });
 
   for (let i = 0; i < howManyRows * 4; i++) {
-    let rand = newJSON[Math.floor(Math.random() * newJSON.length)];
-    let index = newJSON.indexOf(rand);
+    let rand = json[Math.floor(Math.random() * json.length)];
+    let index = json.indexOf(rand);
     addCardToDeck(rand);
     if (index > -1) {
-      //removes from newJSON array
-      newJSON.splice(index, 1);
+      //removes from json array
+      json.splice(index, 1);
     }
   }
 }
@@ -138,7 +139,7 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
-  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
+  const shuffledArray = shuffleArray(gameDeck);
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
@@ -161,14 +162,14 @@ function shuffleArray(array) {
 function addCardToDeck(json) {
   gameDeck.push({
     id: json.id,
-    image: json.img,
-    name: json.name,
+    image: json.attributes.img,
+    name: json.attributes.name,
     matched: false
   });
   gameDeck.push({
     id: "a" + json.id,
-    image: json.img,
-    name: json.name,
+    image: json.attributes.img,
+    name: json.attributes.name,
     matched: false
   }); //2 of each card
 }
@@ -240,7 +241,7 @@ function doTheyMatch() {
     // { //also works, remove the "a" assignment from addCardToDeck. Less good, as id's should be unique
     theyMatch();
   } else {
-    setTimeout(changeBack, 1500);
+    setTimeout(changeBack, 900);
     //Want to make this a click event, not a timeout,
     // but cant get the click working over the entire page.
     // Currently, it only works 'not on a card div'
@@ -295,8 +296,6 @@ function checkGameStatus() {
     // postGameData();
   }
 }
-
-
 
 // FUNCTIONS THAT NEED TO BE WORKED ON
 
