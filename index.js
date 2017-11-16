@@ -1,5 +1,6 @@
 // const form = document.getElementById("form");
 const form = document.getElementById("form");
+const loginButton = document.getElementById("login-button");
 const game = document.getElementById("game");
 const gameDeck = [];
 let currentUser = document.getElementById("current-user");
@@ -13,7 +14,7 @@ let gameOver = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
-  form.addEventListener("submit", function(e) {
+  loginButton.addEventListener("click", function(e) {
     e.preventDefault();
     logInUser();
   });
@@ -37,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function sortUserScoreDescending(data) {
   let users = data.slice(0);
   users.sort((a, b) => {
-    return b.attributes.highscore - a.attributes.highscore;
+    return a.attributes.highscore - b.attributes.highscore;
   });
   return users;
 }
@@ -46,7 +47,7 @@ function sortUserScoreDescending(data) {
 function createUserNameTag(user) {
   let nameTag = document.createElement("p");
   nameTag.setAttribute("class", "title-3 has-text-info has-text-weight-bold");
-  nameTag.innerText = `${user.name}: `;
+  nameTag.innerText = `${user.name}`;
   return nameTag;
 }
 
@@ -61,17 +62,13 @@ function createUserScoreTag(user) {
 // iterate through scoreboard places and populate each rank with tags from cbs
 function populateLeaderboard(data) {
   let sortedUsers = sortUserScoreDescending(data);
-  sortedUsers.sort((a, b) => {
-    return b.attributes.highscore - a.attributes.highscore;
-  });
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
     let rank = scoreboardPlace[i];
     let user = sortedUsers[i].attributes;
     let nameTag = createUserNameTag(user);
     let scoreTag = createUserScoreTag(user);
-    rank.appendChild(nameTag);
-    rank.appendChild(scoreTag);
+    rank.innerHTML = `${nameTag.innerText} completed the game in ${scoreTag.innerText} tries!`;
   }
 }
 
@@ -140,7 +137,7 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
-  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
+  const shuffledArray = shuffleArray(gameDeck);
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
@@ -297,6 +294,7 @@ function checkGameStatus() {
     document.getElementsByClassName("timer-count")[0].innerText = currentTime;
     postGameData();
     gameOver = true;
+    updateLeaderboard();
   }
 }
 
@@ -313,6 +311,7 @@ function checkCurrentUser(json, username) {
   let userHere = false;
   json.forEach(function(json) {
     if (json.attributes.name === username) {
+      console.log("inside");
       userHere = true;
       fetchUser(json, username);
     }
@@ -378,4 +377,13 @@ function updateHighScore(id) {
       }
     })
   });
+  updateLeaderboard();
+}
+
+function updateLeaderboard() {
+  fetch("http://cognizance.herokuapp.com/api/v1/users")
+    .then(res => res.json())
+    .then(json => {
+      populateLeaderboard(json.data);
+    })
 }
