@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
   form.addEventListener("submit", function(e) {
     e.preventDefault();
-    // logInUser();
+    logInUser();
   });
 
   fetch("https://cognizance.herokuapp.com/api/v1/users")
@@ -121,10 +121,6 @@ function generateCards(json) {
 //gets random card from all json, addCardToDe adds to gameDeck,
 // then removes from json array for next iteration
 function makeDecks(json) {
-  let newJSON = json.map(obj => {
-    return obj.attributes;
-  });
-
   for (let i = 0; i < howManyRows * 4; i++) {
     let rand = json[Math.floor(Math.random() * json.length)];
     let index = json.indexOf(rand);
@@ -297,50 +293,56 @@ function checkGameStatus() {
   }
 }
 
+// 'Log in' a user. Just checks input name against json data, makes a new user in api if the name doesnt match any records
+function logInUser() {
+  const username = document.getElementById("nameInput").value;
+  // WE NEED TO MAKE THIS THE HEROKU URL
+  fetch("https://cognizance.herokuapp.com/api/v1/users")
+    .then(res => res.json())
+    .then(json => checkCurrentUser(json.data, username));
+  document.getElementById("nameInput").value = "";
+}
+
+function checkCurrentUser(json, username) {
+  let userHere = false;
+  json.forEach(function(json) {
+    // debugger;
+    if (json.attributes.name === username) {
+      userHere = true;
+      fetchUser(json, username);
+    }
+  });
+  if (!userHere) {
+    makeUser(username);
+  }
+}
+
+function fetchUser(json, username) {
+  // debugger;
+  currentUser.innerText = username;
+}
+
+function makeUser(username) {
+  // debugger;
+  fetch("https://cognizance.herokuapp.com/api/v1/users", {
+    method: "post",
+
+    body: JSON.stringify({ user: { name: username, highscore: 0 } }),
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    }
+  });
+  setUser(username);
+}
+
+function setUser(username) {
+  currentUser.innerText = username;
+}
+
+//-------------------
+
 // FUNCTIONS THAT NEED TO BE WORKED ON
-
-// function logInUser() {
-//   const username = document.getElementById("nameInput").value;
-//   WE NEED TO MAKE THIS THE HEROKU URL
-//   fetch("http://localhost:3000/users")
-//     .then(res => res.json())
-//     .then(json => checkCurrentUser(json, username));
-//   document.getElementById("nameInput").value = "";
-// }
-
-// function checkCurrentUser(json, username) {
-//   let userHere = false;
-//   json.forEach(function(json) {
-//     if (json.name === username) {
-//       userHere = true;
-//       fetchUser(json, username);
-//     }
-//   });
-//   if (!userHere) {
-//     // debugger;
-//     makeUser(username);
-//   }
-// }
-
-// function fetchUser(json, username) {
-//   // debugger;
-//   currentUser.innerText = username;
-// }
-
-// function makeUser(username) {
-//   debugger;
-//   fetch("http://localhost:3000/users", {
-//     method: "post",
-//     mode: "no-cors",
-//     body: JSON.stringify({ user: { name: username, highscore: 25 } }),
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json"
-//     }
-//   })
-//     // .then(res => res.json())
-//     .then(res => console.log(res));
-// }
 
 // function postGameData() {
 //   fetch("http://localhost:3000/users", {
