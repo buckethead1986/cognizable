@@ -24,25 +24,26 @@ document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
   setDifficulty();
 
+  fetch("http://cognizance.herokuapp.com/api/v1/users")
+  .then(res => res.json())
+  .then(json => {
+    populateLeaderboard(json.data);
+    return json;
+  })
+  .then(json => (data = json))
+  .then(json => resetGame());
+
+  fetch("https://cognizance.herokuapp.com/api/v1/cards")
+  .then(res => res.json())
+  .then(json => {
+    initiateGameListener(json.data);
+  });
+  
   loginButton.addEventListener("click", function(e) {
     e.preventDefault();
     logInUser();
   });
 
-  fetch("http://cognizance.herokuapp.com/api/v1/users")
-    .then(res => res.json())
-    .then(json => {
-      populateLeaderboard(json.data);
-      return json;
-    })
-    .then(json => (data = json))
-    .then(json => resetGame());
-
-  fetch("https://cognizance.herokuapp.com/api/v1/cards")
-    .then(res => res.json())
-    .then(json => {
-      initiateGameListener(json.data);
-    });
 });
 
 // create clickable dropdown to set difficulty through number of rows
