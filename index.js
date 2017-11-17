@@ -10,7 +10,7 @@ let easyButton = document.getElementById("easy-difficulty");
 let medButton = document.getElementById("medium-difficulty");
 let hardButton = document.getElementById("hard-difficulty");
 let dropdownText = document.getElementById("dropdown-text");
-let howManyRows;
+let howManyRows = 2;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
