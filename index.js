@@ -4,7 +4,7 @@ const loginButton = document.getElementById("login-button");
 const game = document.getElementById("game");
 const gameDeck = [];
 let currentUser = document.getElementById("current-user");
-let howManyRows = 1;
+let howManyRows = 2;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
@@ -138,7 +138,7 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
-  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
+  const shuffledArray = shuffleArray(gameDeck); // gameDeck; 
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
