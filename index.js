@@ -4,7 +4,13 @@ const loginButton = document.getElementById("login-button");
 const game = document.getElementById("game");
 const gameDeck = [];
 let currentUser = document.getElementById("current-user");
-let howManyRows = 2;
+let dropdown = document.getElementsByClassName("dropdown")
+let dropdownButton = document.getElementById("dropdown-button");
+let easyButton = document.getElementById("easy-difficulty")
+let medButton = document.getElementById("medium-difficulty")
+let hardButton = document.getElementById("hard-difficulty")
+let dropdownText = document.getElementById("dropdown-text");
+let howManyRows
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
@@ -13,7 +19,8 @@ let data;
 let gameOver = false;
 
 document.addEventListener("DOMContentLoaded", () => {
-  makeBoardOfXRows(howManyRows);
+  setDifficulty();
+
   loginButton.addEventListener("click", function(e) {
     e.preventDefault();
     logInUser();
@@ -34,6 +41,31 @@ document.addEventListener("DOMContentLoaded", () => {
       initiateGameListener(json.data);
     });
 });
+
+// create clickable dropdown to set difficulty through number of rows
+function setDifficulty() {
+  dropdownButton.addEventListener("click", (ev) => {
+    dropdown[0].className = "dropdown is-active";
+    easyButton.addEventListener("click", (ev) => {
+      howManyRows = 2;
+      dropdown[0].className = "dropdown"
+      dropdownText.innerText = "Easy";
+      makeBoardOfXRows(howManyRows);
+    });
+    medButton.addEventListener("click", (ev) => {
+      howManyRows = 3;
+      dropdown[0].className = "dropdown"
+      dropdownText.innerText = "Medium";
+      makeBoardOfXRows(howManyRows);
+    });
+    hardButton.addEventListener("click", (ev) => {
+      howManyRows = 4;
+      dropdown[0].className = "dropdown";
+      dropdownText.innerText = "Hard";
+      makeBoardOfXRows(howManyRows);
+    });
+  });
+}
 
 // sort through array of users in descending order based on score
 function sortUserScoreDescending(data) {
