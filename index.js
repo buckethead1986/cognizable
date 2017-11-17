@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // create clickable dropdown to set difficulty through number of rows
 function setDifficulty() {
+  makeBoardOfXRows(howManyRows);
   dropdownButton.addEventListener("click", ev => {
     dropdown[0].className = "dropdown is-active";
     easyButton.addEventListener("click", ev => {
