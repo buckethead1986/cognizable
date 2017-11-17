@@ -4,7 +4,7 @@ const loginButton = document.getElementById("login-button");
 const game = document.getElementById("game");
 const gameDeck = [];
 let currentUser = document.getElementById("current-user");
-let howManyRows = 1;
+let howManyRows = 3;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function sortUserScoreDescending(data) {
   let users = data.slice(0);
   users.sort((a, b) => {
+    // debugger
     return a.attributes.highscore - b.attributes.highscore;
   });
   return users;
@@ -61,7 +62,6 @@ function createUserScoreTag(user) {
 
 // iterate through scoreboard places and populate each rank with tags from cbs
 function populateLeaderboard(data) {
-  // console.log("inside leaderboard pop second time");
   let sortedUsers = sortUserScoreDescending(data);
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
@@ -353,6 +353,7 @@ function postGameData() {
   });
   //checks name against database name, sets id if they match
   const user = users.forEach(function(user) {
+    // debugger;
     if (user[1] === currentUser.innerText) {
       id = user[0];
       //if this games highscore is better (lower) than databse, updates
@@ -382,8 +383,6 @@ function updateLeaderboard() {
   fetch("http://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => {
-      // console.log("inside new fetch");
-      // console.log(json.data);
       populateLeaderboard(json.data);
-    })
+    });
 }
