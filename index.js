@@ -122,6 +122,7 @@ function initiateGameListener(json) {
   });
 }
 
+//gives a 3,2,1 countdown when you hit start
 function startNotification() {
   countDownTimer = window.setTimeout("countDown()", 1000);
 }
@@ -140,6 +141,7 @@ function countDown() {
   }
 }
 
+//div overlaying gameboard
 function replaceDiv() {
   const notification = document.getElementsByClassName("win")[0];
   if (notification) {
@@ -215,7 +217,11 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
+<<<<<<< HEAD
   const shuffledArray = shuffleArray(gameDeck); // gameDeck;
+=======
+  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
+>>>>>>> fetch
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
@@ -379,6 +385,7 @@ function checkGameStatus() {
 // 'Log in' a user. Just checks input name against json data, makes a new user in api if the name doesnt match any records
 function logInUser() {
   const username = document.getElementById("nameInput").value;
+  // debugger;
   fetch("https://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => checkCurrentUser(json.data, username));
@@ -386,6 +393,7 @@ function logInUser() {
 }
 
 function checkCurrentUser(json, username) {
+  // debugger;
   let userHere = false;
   json.forEach(function(json) {
     if (json.attributes.name === username) {
@@ -399,10 +407,11 @@ function checkCurrentUser(json, username) {
 }
 
 function fetchUser(json, username) {
-  currentUser.innerText = username;
+  setUser(username);
 }
 
 function makeUser(username) {
+  // debugger;
   fetch("http://cognizance.herokuapp.com/api/v1/users", {
     method: "post",
 
@@ -416,6 +425,7 @@ function makeUser(username) {
 }
 
 function setUser(username) {
+  currentUser = document.getElementById("current-user");
   currentUser.innerText = username;
 }
 
