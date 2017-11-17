@@ -283,6 +283,7 @@ function addCardListener(card, shuffledArray) {
 //makes a game board of a certain number of rows of 8 cards.
 function makeBoardOfXRows(rows) {
   gameBoardDimensions(rows);
+  game.innerHTML = "";
   for (var i = 0; i < rows; i++) {
     for (var j = 0; j < 8; j++) {
       const card = document.createElement("div");
