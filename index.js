@@ -21,6 +21,7 @@ var countDownTimer;
 var countDownCounter = 4;
 
 document.addEventListener("DOMContentLoaded", () => {
+  makeBoardOfXRows(howManyRows);
   setDifficulty();
 
   loginButton.addEventListener("click", function(e) {
