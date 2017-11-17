@@ -339,7 +339,7 @@ function makeUser(username) {
 }
 
 function setUser(username) {
-  currentUser.innerText = `${username} is playing`;
+  currentUser.innerText = `${username}`;
 }
 
 //-------------------
