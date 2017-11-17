@@ -217,11 +217,7 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
-<<<<<<< HEAD
   const shuffledArray = shuffleArray(gameDeck); // gameDeck;
-=======
-  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
->>>>>>> fetch
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
