@@ -11,6 +11,8 @@ let matchId = [];
 let timer;
 let data;
 let gameOver = false;
+var countDownTimer;
+var countDownCounter = 4;
 
 document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
@@ -79,22 +81,45 @@ function populateLeaderboard(data) {
 function initiateGameListener(json) {
   const startButton = document.getElementById("start-button");
   startButton.addEventListener("click", () => {
-    // debugger;
-    // startNotification();
+    //this prevents a bug where you could click in the interval between start and the first countdown div popping up.
+    const notification = document.createElement("div");
+    notification.className = "win";
+    game.appendChild(notification);
+    startNotification(json);
     generateCards(json);
-    startTimer();
   });
 }
 
-// function startNotification() {
-//   for (let i = 0; i < 3; i++) {
-//     setTimeout(replaceDiv(), 1000);
-//   }
-// }
-//
-// function replaceDiv() {
-//   const notification = document.createElement("div");
-// }
+function startNotification() {
+  countDownTimer = window.setTimeout("countDown()", 1000);
+}
+
+function countDown() {
+  if (countDownCounter === 0) {
+    window.clearTimeout(countDownTimer);
+    countDownTimer = null;
+  } else {
+    countDownCounter = countDownCounter - 1;
+    replaceDiv();
+    if (countDownCounter === 0) {
+      startTimer();
+    }
+    countDownTimer = window.setTimeout("countDown()", 1000);
+  }
+}
+
+function replaceDiv() {
+  const notification = document.getElementsByClassName("win")[0];
+  if (notification) {
+    notification.parentNode.removeChild(notification);
+  }
+  if (countDownCounter > 0) {
+    const countdownDiv = document.createElement("div");
+    countdownDiv.className = "win";
+    countdownDiv.innerText = `Game starting in ${countDownCounter}!`;
+    game.appendChild(countdownDiv);
+  }
+}
 
 function startTimer() {
   let timeDiv = document.getElementsByClassName("timer-count");
