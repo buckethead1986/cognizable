@@ -10,7 +10,7 @@ let easyButton = document.getElementById("easy-difficulty");
 let medButton = document.getElementById("medium-difficulty");
 let hardButton = document.getElementById("hard-difficulty");
 let dropdownText = document.getElementById("dropdown-text");
-let howManyRows = 2;
+let howManyRows = 1;
 let currentFlipped = 0;
 let totalFlips = 0;
 let matchId = [];
@@ -23,6 +23,7 @@ var countDownCounter = 4;
 document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
   setDifficulty();
+  preventClicks();
 
   loginButton.addEventListener("click", function(e) {
     e.preventDefault();
@@ -41,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch("https://cognizance.herokuapp.com/api/v1/cards")
     .then(res => res.json())
     .then(json => {
+      // debugger;
       initiateGameListener(json.data);
     });
 });
@@ -49,20 +51,24 @@ document.addEventListener("DOMContentLoaded", () => {
 function setDifficulty() {
   makeBoardOfXRows(howManyRows);
   dropdownButton.addEventListener("click", ev => {
+    ev.preventDefault();
     dropdown[0].className = "dropdown is-active";
     easyButton.addEventListener("click", ev => {
+      ev.preventDefault();
       howManyRows = 2;
       dropdown[0].className = "dropdown";
       dropdownText.innerText = "Easy";
       makeBoardOfXRows(howManyRows);
     });
     medButton.addEventListener("click", ev => {
+      ev.preventDefault();
       howManyRows = 3;
       dropdown[0].className = "dropdown";
       dropdownText.innerText = "Medium";
       makeBoardOfXRows(howManyRows);
     });
     hardButton.addEventListener("click", ev => {
+      ev.preventDefault();
       howManyRows = 4;
       dropdown[0].className = "dropdown";
       dropdownText.innerText = "Hard";
@@ -77,7 +83,6 @@ function sortUserScoreDescending(data) {
   users.sort((a, b) => {
     return a.attributes.highscore - b.attributes.highscore;
   });
-  // debugger;
   return users;
 }
 
@@ -99,7 +104,6 @@ function createUserScoreTag(user) {
 
 // iterate through scoreboard places and populate each rank with tags from cbs
 function populateLeaderboard(data) {
-  // debugger;
   let sortedUsers = sortUserScoreDescending(data);
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
@@ -111,34 +115,50 @@ function populateLeaderboard(data) {
   }
 }
 
+function preventClicks() {
+  const notification = document.createElement("div");
+  notification.className = "win";
+  game.appendChild(notification);
+}
+
+function eventListener() {
+  // debugger;
+  //this prevents a bug where you could click in the interval between start and the first countdown div popping up.
+  const clickPreventer = document.getElementsByClassName("win")[0];
+  if (!clickPreventer) {
+    preventClicks();
+  }
+
+  startNotification();
+}
 // starts timer and allows user to play when start button is clicked
 function initiateGameListener(json) {
-  const startButton = document.getElementById("start-button");
-  startButton.addEventListener("click", () => {
-    //this prevents a bug where you could click in the interval between start and the first countdown div popping up.
-    const notification = document.createElement("div");
-    notification.className = "win";
-    game.appendChild(notification);
-    startNotification(json);
-    generateCards(json);
-  });
+  let startButton = document.getElementById("start-button");
+  if (startButton.attributes.onclick) {
+    startButton.removeAttribute("onclick", "eventListener()");
+  }
+  startButton.setAttribute("onclick", "eventListener()");
+
+  generateCards(json);
 }
 
 //gives a 3,2,1 countdown when you hit start
 function startNotification() {
+  // debugger;
+  // let startButton = document.getElementById("start-button");
+  countDownCounter = 4;
   countDownTimer = window.setTimeout("countDown()", 1000);
 }
+//gives a 3,2,1 countdown when you hit start
 
 function countDown() {
   if (countDownCounter === 0) {
     window.clearTimeout(countDownTimer);
+    startTimer();
     countDownTimer = null;
   } else {
     countDownCounter = countDownCounter - 1;
     replaceDiv();
-    if (countDownCounter === 0) {
-      startTimer();
-    }
     countDownTimer = window.setTimeout("countDown()", 1000);
   }
 }
@@ -175,28 +195,33 @@ function startTimer() {
 function resetGame() {
   const resetButton = document.getElementsByClassName("game-reset")[0];
   resetButton.addEventListener("click", e => {
+    makeBoardOfXRows(howManyRows);
+    preventClicks();
+    // debugger;
     e.preventDefault();
+    clearInterval(timer);
     let user = currentUser.innerText;
-    debugger;
     let timeDiv = document.getElementsByClassName("timer-count");
     timeDiv[0].innerText = "Timer";
     fetch("https://cognizance.herokuapp.com/api/v1/users")
       .then(res => res.json())
       .then(json => {
+        // debugger;
         populateLeaderboard(json.data);
       });
 
     fetch("https://cognizance.herokuapp.com/api/v1/cards")
       .then(res => res.json())
       .then(json => {
+        // debugger;
         initiateGameListener(json.data);
       });
-    debugger;
-    currentUser.innerText = user;
+    // currentUser.innerText = user;
   });
 }
 
 function generateCards(json) {
+  // debugger;
   makeDecks(json);
   collectCards(json);
 }
@@ -204,13 +229,15 @@ function generateCards(json) {
 //gets random card from all json, addCardToDe adds to gameDeck,
 // then removes from json array for next iteration
 function makeDecks(json) {
+  const json2 = json.slice();
+  // debugger;
   for (let i = 0; i < howManyRows * 4; i++) {
-    let rand = json[Math.floor(Math.random() * json.length)];
-    let index = json.indexOf(rand);
+    let rand = json2[Math.floor(Math.random() * json2.length)];
+    let index = json2.indexOf(rand);
     addCardToDeck(rand);
     if (index > -1) {
       //removes from json array
-      json.splice(index, 1);
+      json2.splice(index, 1);
     }
   }
 }
@@ -239,6 +266,7 @@ function shuffleArray(array) {
 }
 //push 2 of the same card to gameDeck (for matching)
 function addCardToDeck(json) {
+  // debugger;
   gameDeck.push({
     id: json.id,
     image: json.attributes.img,
@@ -255,7 +283,8 @@ function addCardToDeck(json) {
 
 //adds a 'flipping' listener to each card on click
 function addCardListener(card, shuffledArray) {
-  card.addEventListener("click", function() {
+  card.addEventListener("click", function(ev) {
+    ev.preventDefault();
     //fixes bug where you could click the
     // same card twice and get a match
     if (this.id != matchId[1]) {
