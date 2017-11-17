@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
       populateLeaderboard(json.data);
       return json;
     })
-    .then(json => (data = json));
+    .then(json => (data = json))
+    .then(json => resetGame());
 
   fetch("https://cognizance.herokuapp.com/api/v1/cards")
     .then(res => res.json())
@@ -38,9 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
 function sortUserScoreDescending(data) {
   let users = data.slice(0);
   users.sort((a, b) => {
-    // debugger
     return a.attributes.highscore - b.attributes.highscore;
   });
+  // debugger;
   return users;
 }
 
@@ -62,6 +63,7 @@ function createUserScoreTag(user) {
 
 // iterate through scoreboard places and populate each rank with tags from cbs
 function populateLeaderboard(data) {
+  // debugger;
   let sortedUsers = sortUserScoreDescending(data);
   let scoreboardPlace = document.querySelectorAll(".panel-block");
   for (let i = 0; i < scoreboardPlace.length; i++) {
@@ -77,10 +79,22 @@ function populateLeaderboard(data) {
 function initiateGameListener(json) {
   const startButton = document.getElementById("start-button");
   startButton.addEventListener("click", () => {
+    // debugger;
+    // startNotification();
     generateCards(json);
     startTimer();
   });
 }
+
+// function startNotification() {
+//   for (let i = 0; i < 3; i++) {
+//     setTimeout(replaceDiv(), 1000);
+//   }
+// }
+//
+// function replaceDiv() {
+//   const notification = document.createElement("div");
+// }
 
 function startTimer() {
   let timeDiv = document.getElementsByClassName("timer-count");
@@ -98,8 +112,12 @@ function startTimer() {
 
 // reloads webpage when eventlistener on reset button is triggered
 function resetGame() {
-  const resetButton = document.getElementsByClassName("game-reset");
-  resetButton.addEventListener("click", () => {
+  // debugger;
+  const resetButton = document.getElementsByClassName("game-reset")[0];
+  resetButton.addEventListener("click", e => {
+    e.preventDefault();
+    // debugger;
+    let user = currentUser.innerText;
     let timeDiv = document.getElementsByClassName("timer-count");
     timeDiv[0].innerText = "Timer";
     fetch("https://cognizance.herokuapp.com/api/v1/users")
@@ -113,6 +131,8 @@ function resetGame() {
       .then(json => {
         initiateGameListener(json.data);
       });
+    // debugger;
+    currentUser.innerText = user;
   });
 }
 
@@ -138,7 +158,7 @@ function makeDecks(json) {
 //randomizes images, adds an event listener to each card div,
 // specific to an image
 function collectCards(json) {
-  const shuffledArray = gameDeck; //shuffleArray(gameDeck);
+  const shuffledArray = shuffleArray(gameDeck);
   //change shuffleArray(gameDeck) to gameDeck to troubleshoot (won't shuffle)
   const cards = document.getElementsByClassName("card");
   for (let i = 0; i < cards.length; i++) {
@@ -288,12 +308,12 @@ function checkGameStatus() {
   const currentTime = document.getElementsByClassName("timer-count")[0]
     .innerText;
   if (matchedCards.length === howManyRows * 8) {
+    postGameData();
     const win = document.createElement("div");
     win.innerText = `YOU WIN! You took ${totalFlips} tries in ${currentTime} seconds.`;
     win.className = "win";
     game.appendChild(win);
     document.getElementsByClassName("timer-count")[0].innerText = currentTime;
-    postGameData();
     gameOver = true;
     // updateLeaderboard();
   }
@@ -339,7 +359,7 @@ function makeUser(username) {
 }
 
 function setUser(username) {
-  currentUser.innerText = `${username}`;
+  currentUser.innerText = username;
 }
 
 //-------------------
@@ -375,11 +395,14 @@ function updateHighScore(id) {
         highscore: `${totalFlips}`
       }
     })
-  }).then(updateLeaderboard());
+  })
+    .then(res => res.json())
+    .then(json => {
+      updateLeaderboard();
+    });
 }
 
 function updateLeaderboard() {
-  debugger;
   fetch("http://cognizance.herokuapp.com/api/v1/users")
     .then(res => res.json())
     .then(json => {
