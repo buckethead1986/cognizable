@@ -26,21 +26,6 @@ let startButton = document.getElementById("start-button");
 document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
   preventClicks();
-  //
-  // fetch(`${url}users`)
-  //   .then(res => res.json())
-  //   .then(json => {
-  //     populateLeaderboard(json.data);
-  //     return json;
-  //   })
-  //   .then(json => (data = json))
-  //   .then(json => resetGame());
-  //
-  // fetch(`${url}cards`)
-  //   .then(res => res.json())
-  //   .then(json => {
-  //     initiateGameListener(json.data);
-  //   });
 
   loginButton.addEventListener("click", function(e) {
     e.preventDefault();
@@ -59,9 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch(`${url}cards`)
     .then(res => res.json())
     .then(json => (cardData = json));
-  // .then(json => {
-  //   initiateGameListener(json.data);
-  // });
+
   setDifficulty();
 });
 
