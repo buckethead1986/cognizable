@@ -27,6 +27,21 @@ document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
   preventClicks();
 
+  fetch(`${url}users`)
+    .then(res => res.json())
+    .then(json => {
+      populateLeaderboard(json.data);
+      return json;
+    })
+    .then(json => (data = json))
+    .then(json => resetGame());
+
+  fetch(`${url}cards`)
+    .then(res => res.json())
+    .then(json => {
+      initiateGameListener(json.data);
+    });
+
   loginButton.addEventListener("click", function(e) {
     e.preventDefault();
     logInUser();
@@ -447,7 +462,7 @@ function fetchUser(json, username) {
 
 function makeUser(username) {
   // ;
-  fetch("http://cognizance.herokuapp.com/api/v1/users", {
+  fetch(`${url}users`, {
     method: "post",
 
     body: JSON.stringify({ user: { name: username, highscore: 500 } }),
@@ -486,7 +501,7 @@ function postGameData() {
 }
 
 function updateHighScore(id) {
-  fetch(`http://cognizance.herokuapp.com/api/v1/users/${id}`, {
+  fetch(`${url}users/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json"
@@ -505,7 +520,7 @@ function updateHighScore(id) {
 }
 
 function updateLeaderboard() {
-  fetch("http://cognizance.herokuapp.com/api/v1/users")
+  fetch(`${url}users`)
     .then(res => res.json())
     .then(json => {
       populateLeaderboard(json.data);
