@@ -2,7 +2,8 @@
 const form = document.getElementById("form");
 const loginButton = document.getElementById("login-button");
 const game = document.getElementById("game");
-const gameDeck = [];
+const url = "https://cognizance.herokuapp.com/api/v1/";
+let gameDeck = [];
 let currentUser = document.getElementById("current-user");
 let dropdown = document.getElementsByClassName("dropdown");
 let dropdownButton = document.getElementById("dropdown-button");
@@ -16,13 +17,14 @@ let totalFlips = 0;
 let matchId = [];
 let timer;
 let data;
+let cardData;
 let gameOver = false;
 var countDownTimer;
 var countDownCounter = 4;
+let startButton = document.getElementById("start-button");
 
 document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
-  setDifficulty();
   preventClicks();
 
   loginButton.addEventListener("click", function(e) {
@@ -30,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logInUser();
   });
 
-  fetch("http://cognizance.herokuapp.com/api/v1/users")
+  fetch(`${url}users`)
     .then(res => res.json())
     .then(json => {
       populateLeaderboard(json.data);
@@ -39,12 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(json => (data = json))
     .then(json => resetGame());
 
-  fetch("https://cognizance.herokuapp.com/api/v1/cards")
+  fetch(`${url}cards`)
     .then(res => res.json())
+    .then(json => (cardData = json))
     .then(json => {
-      // debugger;
+      // ;
       initiateGameListener(json.data);
     });
+  setDifficulty();
 });
 
 // create clickable dropdown to set difficulty through number of rows
@@ -59,6 +63,7 @@ function setDifficulty() {
       dropdown[0].className = "dropdown";
       dropdownText.innerText = "Easy";
       makeBoardOfXRows(howManyRows);
+      initiateGameListener(cardData.data);
     });
     medButton.addEventListener("click", ev => {
       ev.preventDefault();
@@ -66,6 +71,7 @@ function setDifficulty() {
       dropdown[0].className = "dropdown";
       dropdownText.innerText = "Medium";
       makeBoardOfXRows(howManyRows);
+      initiateGameListener(cardData.data);
     });
     hardButton.addEventListener("click", ev => {
       ev.preventDefault();
@@ -73,6 +79,7 @@ function setDifficulty() {
       dropdown[0].className = "dropdown";
       dropdownText.innerText = "Hard";
       makeBoardOfXRows(howManyRows);
+      initiateGameListener(cardData.data);
     });
   });
 }
@@ -122,34 +129,33 @@ function preventClicks() {
 }
 
 function eventListener() {
-  // debugger;
   //this prevents a bug where you could click in the interval between start and the first countdown div popping up.
   const clickPreventer = document.getElementsByClassName("win")[0];
   if (!clickPreventer) {
     preventClicks();
   }
-
+  preventStartButton();
   startNotification();
 }
-// starts timer and allows user to play when start button is clicked
-function initiateGameListener(json) {
-  let startButton = document.getElementById("start-button");
+
+function preventStartButton() {
   if (startButton.attributes.onclick) {
     startButton.removeAttribute("onclick", "eventListener()");
   }
+}
+// starts timer and allows user to play when start button is clicked
+function initiateGameListener(json) {
+  preventStartButton();
   startButton.setAttribute("onclick", "eventListener()");
-
   generateCards(json);
 }
 
 //gives a 3,2,1 countdown when you hit start
 function startNotification() {
-  // debugger;
   // let startButton = document.getElementById("start-button");
   countDownCounter = 4;
   countDownTimer = window.setTimeout("countDown()", 1000);
 }
-//gives a 3,2,1 countdown when you hit start
 
 function countDown() {
   if (countDownCounter === 0) {
@@ -197,23 +203,23 @@ function resetGame() {
   resetButton.addEventListener("click", e => {
     makeBoardOfXRows(howManyRows);
     preventClicks();
-    // debugger;
+    // ;
     e.preventDefault();
     clearInterval(timer);
     let user = currentUser.innerText;
     let timeDiv = document.getElementsByClassName("timer-count");
     timeDiv[0].innerText = "Timer";
-    fetch("https://cognizance.herokuapp.com/api/v1/users")
+    fetch(`${url}users`)
       .then(res => res.json())
       .then(json => {
-        // debugger;
+        // ;
         populateLeaderboard(json.data);
       });
 
-    fetch("https://cognizance.herokuapp.com/api/v1/cards")
+    fetch(`${url}cards`)
       .then(res => res.json())
       .then(json => {
-        // debugger;
+        // ;
         initiateGameListener(json.data);
       });
     // currentUser.innerText = user;
@@ -221,7 +227,7 @@ function resetGame() {
 }
 
 function generateCards(json) {
-  // debugger;
+  // ;
   makeDecks(json);
   collectCards(json);
 }
@@ -229,8 +235,9 @@ function generateCards(json) {
 //gets random card from all json, addCardToDe adds to gameDeck,
 // then removes from json array for next iteration
 function makeDecks(json) {
+  // ;
+  gameDeck = [];
   const json2 = json.slice();
-  // debugger;
   for (let i = 0; i < howManyRows * 4; i++) {
     let rand = json2[Math.floor(Math.random() * json2.length)];
     let index = json2.indexOf(rand);
@@ -266,7 +273,7 @@ function shuffleArray(array) {
 }
 //push 2 of the same card to gameDeck (for matching)
 function addCardToDeck(json) {
-  // debugger;
+  // ;
   gameDeck.push({
     id: json.id,
     image: json.attributes.img,
@@ -406,21 +413,22 @@ function checkGameStatus() {
     document.getElementsByClassName("timer-count")[0].innerText = currentTime;
     gameOver = true;
     // updateLeaderboard();
+    startButton.setAttribute("onclick", "eventListener()");
   }
 }
 
 // 'Log in' a user. Just checks input name against json data, makes a new user in api if the name doesnt match any records
 function logInUser() {
   const username = document.getElementById("nameInput").value;
-  // debugger;
-  fetch("https://cognizance.herokuapp.com/api/v1/users")
+  // ;
+  fetch(`${url}users`)
     .then(res => res.json())
     .then(json => checkCurrentUser(json.data, username));
   document.getElementById("nameInput").value = "";
 }
 
 function checkCurrentUser(json, username) {
-  // debugger;
+  // ;
   let userHere = false;
   json.forEach(function(json) {
     if (json.attributes.name === username) {
@@ -438,7 +446,7 @@ function fetchUser(json, username) {
 }
 
 function makeUser(username) {
-  // debugger;
+  // ;
   fetch("http://cognizance.herokuapp.com/api/v1/users", {
     method: "post",
 
