@@ -1,4 +1,3 @@
-// const form = document.getElementById("form");
 const form = document.getElementById("form");
 const loginButton = document.getElementById("login-button");
 const game = document.getElementById("game");
@@ -7,6 +6,7 @@ let gameDeck = [];
 let currentUser = document.getElementById("current-user");
 let dropdown = document.getElementsByClassName("dropdown");
 let dropdownButton = document.getElementById("dropdown-button");
+let simpleButton = document.getElementById("simple-difficulty");
 let easyButton = document.getElementById("easy-difficulty");
 let medButton = document.getElementById("medium-difficulty");
 let hardButton = document.getElementById("hard-difficulty");
@@ -26,21 +26,21 @@ let startButton = document.getElementById("start-button");
 document.addEventListener("DOMContentLoaded", () => {
   makeBoardOfXRows(howManyRows);
   preventClicks();
-
-  fetch(`${url}users`)
-    .then(res => res.json())
-    .then(json => {
-      populateLeaderboard(json.data);
-      return json;
-    })
-    .then(json => (data = json))
-    .then(json => resetGame());
-
-  fetch(`${url}cards`)
-    .then(res => res.json())
-    .then(json => {
-      initiateGameListener(json.data);
-    });
+  //
+  // fetch(`${url}users`)
+  //   .then(res => res.json())
+  //   .then(json => {
+  //     populateLeaderboard(json.data);
+  //     return json;
+  //   })
+  //   .then(json => (data = json))
+  //   .then(json => resetGame());
+  //
+  // fetch(`${url}cards`)
+  //   .then(res => res.json())
+  //   .then(json => {
+  //     initiateGameListener(json.data);
+  //   });
 
   loginButton.addEventListener("click", function(e) {
     e.preventDefault();
@@ -58,11 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fetch(`${url}cards`)
     .then(res => res.json())
-    .then(json => (cardData = json))
-    .then(json => {
-      // ;
-      initiateGameListener(json.data);
-    });
+    .then(json => (cardData = json));
+  // .then(json => {
+  //   initiateGameListener(json.data);
+  // });
   setDifficulty();
 });
 
@@ -72,6 +71,14 @@ function setDifficulty() {
   dropdownButton.addEventListener("click", ev => {
     ev.preventDefault();
     dropdown[0].className = "dropdown is-active";
+    simpleButton.addEventListener("click", ev => {
+      ev.preventDefault();
+      howManyRows = 1;
+      dropdown[0].className = "dropdown";
+      dropdownText.innerText = "Simple";
+      makeBoardOfXRows(howManyRows);
+      initiateGameListener(cardData.data);
+    });
     easyButton.addEventListener("click", ev => {
       ev.preventDefault();
       howManyRows = 2;
@@ -98,6 +105,16 @@ function setDifficulty() {
     });
   });
 }
+
+const disableDifficultyAndStartButtons = () => {
+  dropdownButton.disabled = true;
+  startButton.disabled = true;
+};
+
+const enableDifficultyAndStartButtons = () => {
+  dropdownButton.disabled = false;
+  startButton.disabled = false;
+};
 
 // sort through array of users in descending order based on score
 function sortUserScoreDescending(data) {
@@ -149,6 +166,8 @@ function eventListener() {
   if (!clickPreventer) {
     preventClicks();
   }
+  generateCards(cardData.data);
+  disableDifficultyAndStartButtons();
   preventStartButton();
   startNotification();
 }
@@ -158,16 +177,15 @@ function preventStartButton() {
     startButton.removeAttribute("onclick", "eventListener()");
   }
 }
+
 // starts timer and allows user to play when start button is clicked
 function initiateGameListener(json) {
   preventStartButton();
   startButton.setAttribute("onclick", "eventListener()");
-  generateCards(json);
 }
 
 //gives a 3,2,1 countdown when you hit start
 function startNotification() {
-  // let startButton = document.getElementById("start-button");
   countDownCounter = 4;
   countDownTimer = window.setTimeout("countDown()", 1000);
 }
@@ -218,7 +236,8 @@ function resetGame() {
   resetButton.addEventListener("click", e => {
     makeBoardOfXRows(howManyRows);
     preventClicks();
-    // ;
+    enableDifficultyAndStartButtons();
+
     e.preventDefault();
     clearInterval(timer);
     let user = currentUser.innerText;
@@ -227,22 +246,18 @@ function resetGame() {
     fetch(`${url}users`)
       .then(res => res.json())
       .then(json => {
-        // ;
         populateLeaderboard(json.data);
       });
 
     fetch(`${url}cards`)
       .then(res => res.json())
       .then(json => {
-        // ;
         initiateGameListener(json.data);
       });
-    // currentUser.innerText = user;
   });
 }
 
 function generateCards(json) {
-  // ;
   makeDecks(json);
   collectCards(json);
 }
@@ -250,7 +265,6 @@ function generateCards(json) {
 //gets random card from all json, addCardToDe adds to gameDeck,
 // then removes from json array for next iteration
 function makeDecks(json) {
-  // ;
   gameDeck = [];
   const json2 = json.slice();
   for (let i = 0; i < howManyRows * 4; i++) {
@@ -288,7 +302,6 @@ function shuffleArray(array) {
 }
 //push 2 of the same card to gameDeck (for matching)
 function addCardToDeck(json) {
-  // ;
   gameDeck.push({
     id: json.id,
     image: json.attributes.img,
@@ -435,7 +448,7 @@ function checkGameStatus() {
 // 'Log in' a user. Just checks input name against json data, makes a new user in api if the name doesnt match any records
 function logInUser() {
   const username = document.getElementById("nameInput").value;
-  // ;
+
   fetch(`${url}users`)
     .then(res => res.json())
     .then(json => checkCurrentUser(json.data, username));
@@ -443,7 +456,6 @@ function logInUser() {
 }
 
 function checkCurrentUser(json, username) {
-  // ;
   let userHere = false;
   json.forEach(function(json) {
     if (json.attributes.name === username) {
@@ -461,7 +473,6 @@ function fetchUser(json, username) {
 }
 
 function makeUser(username) {
-  // ;
   fetch(`${url}users`, {
     method: "post",
 
