@@ -1,1 +1,3 @@
-# memory_Api_front_end
+# Cognizable
+
+Cognizable is a clone of the game 'Memory', built with Javascript.
