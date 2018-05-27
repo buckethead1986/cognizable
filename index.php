@@ -164,5 +164,6 @@
         <!-- end of bottom tiles containing padding and login and leaderboard -->
       </div>
     <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="test.js"></script>
   </body>
 </html>
