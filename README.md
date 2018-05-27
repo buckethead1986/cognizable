@@ -4,7 +4,7 @@ Find the application at https://cognizable.herokuapp.com
 
 ## Overview
 
-Cognizable is a front-end Javascript clone of the popular game 'Memory'. Log in (not password protected), select a difficulty, and match upturned cards together. Time taken and turns made are kept track of for the high scores leaderboard.
+Cognizable is a front-end Javascript clone of the popular game 'Memory'.  Log in (not password protected), select a difficulty, and match upturned cards together. Time taken and turns made are kept track of for the high scores leaderboard.
 
 ## Technology
 
@@ -17,7 +17,7 @@ pertaining to sessions, users, and cards.
 
 A user logs in, selects a difficulty, and starts playing a game.
 
-When all cards have been matched, the game ends, and total turns are displayed.  If the total turns are less a high score on the leaderboard, it gets updated (one high score per player).
+When all cards have been matched, the game ends, and total turns are displayed.  If the total turns are less than a high score on the leaderboard, it gets updated (one high score per player).
 
 ## Layout / Design
 
